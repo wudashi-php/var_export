@@ -1,7 +1,12 @@
 <?php
 /*
 	自研紧凑型PHP数组打印代码
-  
+	输出的字符串示例：
+  	array('name'=>'wudashi','title'=>'吴爷','list'=>array(
+		array('type'=>'type1','title'=>'测试1'),
+		array('type'=>'type2','title'=>'测试2'),
+	),);
+	说明：
 	var_export_array		导出函数
 		$data		要导出的变量
 		$t			基准tab值，最终导出字符串的tab将在此基础上进行缩进
