@@ -32,18 +32,18 @@ function var_export_array($data,$t=''){
 		if(isAssocArray($data)){
 			//数值型数组
 			foreach($data as $value){
-				$string.="\n{$t}\t".var_exports($value,$t."\t").',';
+				$string.="\n{$t}\t".var_export_array($value,$t."\t").',';
 			}
 			$string.="\n{$t})";
 		}else{
 			if(count($data)>5){
 				foreach($data as $key=>$value){
-					$string.="\n{$t}\t'{$key}'=>".var_exports($value,$t."\t").',';
+					$string.="\n{$t}\t'{$key}'=>".var_export_array($value,$t."\t").',';
 				}
 				$string.="\n{$t})";
 			}else{
 				foreach($data as $key=>$value){
-					$string.="'{$key}'=>".var_exports($value,$t).',';
+					$string.="'{$key}'=>".var_export_array($value,$t).',';
 				}
 				$string.=')';
 			}
