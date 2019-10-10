@@ -10,25 +10,10 @@
 		如果用严格匹配也不好，因为如果枚举类型是数字，提交的值极有可能是字符串类型的数字，这时肯定是需要通过的。
 		可以这样，增加一个数据类型限制。这样用起来麻烦，最好直接在内部判断。如果待匹配值是0，则逐个判断枚举项是否为0或者'0' is_numeric && ==0。
 		
-	示例校验声明数组
-	$check=array(
-		'field1'=>'int',//整数
-		'field2'=>'float',//浮点数
-		'field3'=>'number',//数字（整数、浮点数均可）
-		'field4'=>array('int',0,3),//大于等于0，小于等于3的正整数
-		'field5'=>'string',//字符串
-		'field6'=>array('string',0,3),//字符串长度大于等于0小于等于3
-		'field7'=>array('preg','/$\w+$/'),//正则匹配。由字母数字下划线组成的字符串
-		'field8'=>array('enum',array('wechat','alipay','credit'))//枚举
-		'field9'=>array('arr',array('preg','/$\w+$/'))//第二项参数为子元素的类型声明数组
-		'field10'=>array('obj',array(//对象
-			'field1'=>'int',//整数
-			'field2'=>'float',//浮点数
-			'field3'=>'number',//数字（整数、浮点数均可）
-		)),
-		'field11'=>'bool',//布尔值
-	);
-	总结，声明数组以字段名为键名，以类型限制声明作为键值。类型限制支持两种形式，一是简单的类型字符串，二是类型限制数组。
+	使用方法
+		见下面的代码
+	总结，声明数组以字段名为键名，以类型限制声明作为键值。类型限制支持两种形式，一是简单的类型字符串，二是类型声明数组。
+		类型声明数组第一个元素为类型标识，第二个元素以上为额外限制内容，例如数字的取值范围，对象的属性类型限制等
 	
 	已支持的数据校验类型
 	int		整数
@@ -46,8 +31,15 @@
 	word	单词字符串（由字母数字下划线组成的字符串）
 	mobile	手机号
 	email	邮箱
+	
+	其他数据类型
+	如需增加更多数据类型校验，可增加相应函数。例如增加身份证号码校验，数据类型标识为 idcard
+		public function check_idcard($data){
+			//这里执行校验代码，成功返回true，失败返回false
+		}
 */
-
+$form=new form_check();
+//方法1，对收到的整个表单对象进行校验。调用check方法，传入表单对象，校验数组，错误消息数组（可不传）。
 $data=array(
 	'field1'=>'2222',//整数
 	'field2'=>'123ss@qq.com',//浮点数
@@ -65,34 +57,45 @@ $data=array(
 	),
 	'field11'=>true,//布尔值
 	'field19'=>array(
-		array('field11'=>11,'field22'=>'11.22','field33'=>'123ss@qq.com'),
-		array('field11'=>32,'field22'=>131.22,'field33'=>'12334ss@qq.com'),
+		array('field11'=>11,'field22'=>'1122','field33'=>'123ss@qq.com'),
+		array('field11'=>32,'field22'=>'khjktyg','field33'=>'12334ss@qq.com'),
 	),
 );
-$check=array(
+$check=[
 	'field1'=>'int',//整数
 	'field2'=>'email',//浮点数
 	'field3'=>'number',//数字（整数、浮点数均可）
-	'field4'=>array('int',0,3),//大于等于0，小于等于3的正整数
+	'field4'=>['int',0,3],//大于等于0，小于等于3的正整数
 	'field5'=>'string',//字符串
-	'field6'=>array('string',0,3),//字符串长度大于等于0小于等于3
-	'field7'=>array('preg','/^\w+$/'),//正则匹配。由字母数字下划线组成的字符串
-	'field8'=>array('enum',array('wechat','alipay','credit')),//枚举
-	'field9'=>array('arr',array('preg','/^\w+$/')),//第二项参数为子元素的类型声明数组
-	'field10'=>array('obj',array(//对象
+	'field6'=>['string',0,3],//字符串长度大于等于0小于等于3
+	'field7'=>['preg','/^\w+$/'],//正则匹配。由字母数字下划线组成的字符串
+	'field8'=>['enum',['wechat','alipay','credit']],//枚举
+	'field9'=>['arr',['preg','/^\w+$/']],//第二项参数为子元素的类型声明数组
+	'field10'=>['obj',[//对象
 		'field11'=>'int',//整数
 		'field22'=>'float',//浮点数
 		'field33'=>'number',//数字（整数、浮点数均可）
-	)),
+	]],
 	'field11'=>'bool',//布尔值
-	'field19'=>array('arr',array('obj',array(//对象
-		'field11'=>'int',//整数
-		'field22'=>'float',//浮点数
-		'field33'=>'email',//数字（整数、浮点数均可）
-	)))
-);
-$form=new form_check();
+	'field19'=>[
+		'arr',//数组
+		[
+			'obj',//对象
+			[
+				'field11'=>'int',//整数
+				'field22'=>'word',//浮点数
+				'field33'=>'email',//数字（整数、浮点数均可）
+			]
+		]
+	]
+];
+
 $form->check($data,$check);
+//方法二。校验单个数据，调用相应数据类型校验方法
+if(!$form->check_mobile('13566666667')){
+	exit('手机号不合法');
+}
+;
 exit('success');
 function error($message){
 	exit($message);
@@ -108,7 +111,7 @@ class form_check{
 			}
 			if(is_string($params)){
 				$check_method='check_'.$params;
-				$check_params=array();
+				$check_params=[];
 			}elseif(is_array($params)){
 				$check_method='check_'.array_shift($params);
 				$check_params=$params;
@@ -312,7 +315,7 @@ class form_check{
 		$params=$params[0];
 		if(is_string($params)){
 			$check_method='check_'.$params;
-			$check_params=array();
+			$check_params=[];
 		}elseif(is_array($params)){
 			$check_method='check_'.array_shift($params);
 			$check_params=$params;
