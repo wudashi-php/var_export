@@ -1,0 +1,8 @@
+wget https://www.php.net/distributions/php-7.3.10.tar.gz
+tar -zxvf php-7.3.10.tar.gz
+cd php-7.3.10
+./configure --prefix=/usr/local/php --exec-prefix=/usr/local/php --bindir=/usr/local/php/bin --sbindir=/usr/local/php/sbin --includedir=/usr/local/php/include --libdir=/usr/local/php/lib/php --mandir=/usr/local/php/php/man --with-config-file-path=/usr/local/php/etc --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-iconv-dir --with-freetype-dir=/usr/local/freetype.2.1.10 --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir --with-ldap=shared --with-gdbm --with-pear --with-gettext --with-curl --with-xmlrpc --with-openssl --with-mhash --with-gd --enable-fpm --enable-mysqlnd --enable-mysqlnd-compression-support --enable-xml --enable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --enable-mbregex --enable-mbstring --enable-intl --enable-ftp --enable-gd-jis-conv --enable-pcntl --enable-sockets --enable-zip --enable-soap --enable-fileinfo --enable-opcache --enable-maintainer-zts
+make && make install
+
+教程：
+	https://www.php.cn/php-weizijiaocheng-414091.html
